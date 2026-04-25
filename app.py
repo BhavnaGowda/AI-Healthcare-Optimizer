@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
 from statsmodels.tsa.arima.model import ARIMA
 from scipy.optimize import linprog
@@ -11,23 +10,25 @@ from scipy.optimize import linprog
 st.set_page_config(page_title="AI Healthcare Optimizer", layout="wide")
 
 # -------------------------
-# DARK STYLE
-# -------------------------
-st.markdown("""
-<style>
-body { background-color: #0e1117; color: white; }
-.metric { background-color: #1c1f26; padding: 10px; border-radius: 10px; }
-</style>
-""", unsafe_allow_html=True)
-
-# -------------------------
-# LOGIN SYSTEM
+# SESSION INIT
 # -------------------------
 if "login" not in st.session_state:
     st.session_state.login = False
 
+# -------------------------
+# DEMO LOGIN BUTTON (FIXED)
+# -------------------------
+st.sidebar.title("🔑 Access")
+if st.sidebar.button("Use Demo Login"):
+    st.session_state.login = True
+
+# -------------------------
+# LOGIN PAGE
+# -------------------------
 if not st.session_state.login:
-    st.title("🔐 Login - AI Healthcare Optimizer")
+    st.title("🔐 AI Healthcare Resource Optimizer")
+
+    st.subheader("Login")
     user = st.text_input("Username")
     pwd = st.text_input("Password", type="password")
 
@@ -37,6 +38,7 @@ if not st.session_state.login:
         else:
             st.error("Invalid credentials")
 
+    st.info("👉 Click 'Use Demo Login' from sidebar to explore instantly")
     st.stop()
 
 # -------------------------
@@ -60,7 +62,7 @@ TOTAL_STAFF = 120
 def optimize_resources(predicted):
     c = [1, 1]
     A = [[-1, 0], [0, -1]]
-    b = [-predicted*0.6, -predicted*0.2]
+    b = [-predicted * 0.6, -predicted * 0.2]
     bounds = [(0, TOTAL_BEDS), (0, TOTAL_STAFF)]
 
     result = linprog(c, A_ub=A, b_ub=b, bounds=bounds)
@@ -68,7 +70,7 @@ def optimize_resources(predicted):
     return int(beds), int(staff)
 
 # -------------------------
-# SIDEBAR
+# SIDEBAR NAVIGATION
 # -------------------------
 st.sidebar.title("🏥 Dashboard")
 page = st.sidebar.radio("Navigate", ["Overview", "Analytics", "Alerts"])
@@ -77,17 +79,16 @@ page = st.sidebar.radio("Navigate", ["Overview", "Analytics", "Alerts"])
 # HEADER
 # -------------------------
 st.title("🏥 AI Healthcare Resource Optimizer")
-st.markdown("### Predict • Optimize • Save Lives")
+st.caption("AI system that predicts patient demand and optimizes hospital resources")
 
 # -------------------------
-# OVERVIEW
+# OVERVIEW PAGE
 # -------------------------
 if page == "Overview":
 
     col1, col2, col3 = st.columns(3)
-
     col1.metric("Avg Patients", int(data['patients'].mean()))
-    col2.metric("Peak Demand", int(max(forecast)))
+    col2.metric("Peak Forecast", int(max(forecast)))
     col3.metric("Available Beds", TOTAL_BEDS)
 
     st.subheader("📊 Demand Forecast")
@@ -104,7 +105,7 @@ if page == "Overview":
     st.plotly_chart(fig, use_container_width=True)
 
 # -------------------------
-# ANALYTICS
+# ANALYTICS PAGE
 # -------------------------
 elif page == "Analytics":
 
@@ -122,21 +123,20 @@ elif page == "Analytics":
         st.plotly_chart(fig2, use_container_width=True)
 
     with col2:
-        st.write("### Allocation Table")
-
         alloc_data = []
         for i, val in enumerate(forecast):
             b, s = optimize_resources(val)
             alloc_data.append([i+1, int(val), b, s])
 
-        df_alloc = pd.DataFrame(alloc_data, columns=[
-            "Day", "Patients", "Beds", "Staff"
-        ])
+        df_alloc = pd.DataFrame(
+            alloc_data,
+            columns=["Day", "Patients", "Beds", "Staff"]
+        )
 
         st.dataframe(df_alloc, use_container_width=True)
 
 # -------------------------
-# ALERTS
+# ALERTS PAGE
 # -------------------------
 elif page == "Alerts":
 
@@ -150,11 +150,20 @@ elif page == "Alerts":
         else:
             st.success("✅ Balanced Load")
 
-    st.subheader("📌 Insights")
-
+    st.subheader("📌 Key Insights")
     st.write(f"• Peak demand: **{int(max(forecast))} patients**")
     st.write("• Increase ICU beds during peak")
     st.write("• Optimize staff scheduling dynamically")
 
-if st.sidebar.button("Use Demo Login"):
-    st.session_state.login = True
+# -------------------------
+# ABOUT SECTION
+# -------------------------
+with st.expander("ℹ️ About Project"):
+    st.write("""
+    This project uses:
+    - ARIMA for patient demand prediction
+    - Linear Programming for resource optimization
+    - Streamlit for dashboard visualization
+
+    Goal: Improve hospital efficiency and reduce overcrowding.
+    """)
