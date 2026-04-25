@@ -155,3 +155,6 @@ elif page == "Alerts":
     st.write(f"• Peak demand: **{int(max(forecast))} patients**")
     st.write("• Increase ICU beds during peak")
     st.write("• Optimize staff scheduling dynamically")
+
+if st.sidebar.button("Use Demo Login"):
+    st.session_state.login = True
