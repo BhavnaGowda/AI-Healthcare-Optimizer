@@ -58,15 +58,6 @@ The system:
 👉 https://ai-healthcare-optimizer-kheetvfxpjawteswdeojtk.streamlit.app/
 
 ---
-
-## 🛠 Installation
-
-```bash
-git clone https://github.com/BhavnaGowda/AI-Healthcare-Optimizer.git
-cd AI-Healthcare-Optimizer
-pip install -r requirements.txt
-streamlit run app.py
-
 🔐 Login Credentials
 Username: admin
 Password: 1234
@@ -87,3 +78,13 @@ Real-time hospital integration
 Advanced ML models
 Mobile app version
 IoT healthcare integration
+
+
+## 🛠 Installation
+
+```bash
+git clone https://github.com/BhavnaGowda/AI-Healthcare-Optimizer.git
+cd AI-Healthcare-Optimizer
+pip install -r requirements.txt
+streamlit run app.py
+
